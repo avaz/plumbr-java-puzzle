@@ -1,0 +1,65 @@
+package slow;
+
+import java.math.BigInteger;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import slow.internal.Source;
+
+public class Worker implements Runnable {
+
+  private final int lineIndex;
+  private final CountDownLatch latch;
+
+  public static final List<BigInteger> numbers = new LinkedList<>();
+  private static final Object lock = new Object();
+  private static final Cache cache = new Cache();
+
+  private final BigInteger zero = new BigInteger( "0" );
+  private final BigInteger one = new BigInteger( "1" );
+  private final BigInteger two = new BigInteger( "2" );
+
+  public Worker( int lineIndex, CountDownLatch latch ) {
+    this.lineIndex = lineIndex;
+    this.latch = latch;
+  }
+
+  @Override
+  public void run() {
+    try {
+      long start = System.currentTimeMillis();
+      synchronized ( numbers ) {
+        int numberIndex = Source.getValueAtLine( lineIndex );
+        numbers.add( calculateSecret( BigInteger.valueOf( numberIndex ) ) );
+      }
+      latch.countDown();
+      System.out.printf( "Secret calculated in %d ms. Remaining secrets to calculate: %d%n",
+                         System.currentTimeMillis() - start, latch.getCount() );
+    }
+    catch ( Throwable t ) {
+      t.printStackTrace();
+    }
+  }
+
+  public BigInteger calculateSecret( BigInteger index ) {
+    if ( index.compareTo( zero ) < 0 ) {
+      return zero;
+    }
+    if ( index.compareTo( two ) == 0 ) {
+      return one;
+    }
+    synchronized ( numbers ) {
+      BigInteger value = (BigInteger) cache.get( index );
+      if ( value != null ) {
+        return value;
+      }
+      else {
+        final BigInteger first = calculateSecret( index.subtract( one ) );
+        final BigInteger second = calculateSecret( index.subtract( two ) );
+        value = first.add( second );
+        cache.put( index, value );
+        return value;
+      }
+    }
+  }
+}

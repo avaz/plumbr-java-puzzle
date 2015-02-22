@@ -1,0 +1,16 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+wrapper {
+  gradleVersion '2.1'
+}
+
+sourceSets {
+  main {
+    java {
+      srcDir 'main/java'
+    }
+  }
+}
+applicationDefaultJvmArgs = ["-XX:+UnlockCommercialFeatures"]
+mainClassName = 'slow.internal.Main'
