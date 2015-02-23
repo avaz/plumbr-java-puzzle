@@ -5,7 +5,7 @@ The Puzzle info
 [https://plumbr.eu/blog/java-puzzle](https://plumbr.eu/blog/java-puzzle)
 
 
-The oficial solution: 
+The official solution: 
 
 [https://plumbr.eu/blog/java-puzzle-solution](https://plumbr.eu/blog/java-puzzle-solution)
 
